@@ -50,4 +50,4 @@ jobs:
           buildah manifest add ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:linux-amd64
           buildah manifest add ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:linux-ppc64le
       - name: Push manifest
-        run: buildah manifest push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} --creds ${{ secrets.QUAY_USER }}:${{ secrets.QUAY_PWD }} --all
+        run: buildah manifest push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  docker:${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} --creds ${{ secrets.QUAY_USER }}:${{ secrets.QUAY_PWD }} --all
