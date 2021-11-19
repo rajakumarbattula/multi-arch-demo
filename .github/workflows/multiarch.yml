@@ -8,15 +8,15 @@ on:
 
 env:
   IMAGE_TAG: latest
+  IMAGE_NAME: test-multi-arch
+  IMAGE_REGISTRY: quay.io
+  IMAGE_NAMESPACE: mayurwaghmode111
 
 jobs:
   build-multiplatform-containerfile:
     name: Build multi-platform image using Containerfile
-    env:
-      IMAGE_NAME: test-multi-arch
     runs-on: ubuntu-20.04
     steps:
-
       - name: Install qemu dependency
         run: |
           sudo apt-get update
@@ -50,4 +50,4 @@ jobs:
           buildah manifest add ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:linux-amd64
           buildah manifest add ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:linux-ppc64le
       - name: Push manifest
-        run: buildah manifest push ${{ env.IMAGE_NAME }}:latest docker://quay.io/mayurwaghmode111/${{ env.IMAGE_NAME }}:latest --creds ${{ secrets.QUAY_USER }}:${{ secrets.QUAY_PWD }} --all
+        run: buildah manifest push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} --creds ${{ secrets.QUAY_USER }}:${{ secrets.QUAY_PWD }} --all
