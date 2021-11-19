@@ -50,4 +50,4 @@ jobs:
           buildah manifest add ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:linux-amd64
           buildah manifest add ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:linux-ppc64le
       - name: Push manifest
-        run: buildah manifest push ${{ env.IMAGE_NAME }}:latest docker://quay.io/mayurwaghmode111/${{ env.IMAGE_NAME }}:latest --creds mayurwaghmode111:${{ secrets.QUAY_PWD }} --all
+        run: buildah manifest push ${{ env.IMAGE_NAME }}:latest docker://quay.io/mayurwaghmode111/${{ env.IMAGE_NAME }}:latest --creds ${{ secrets.QUAY_USER }}:${{ secrets.QUAY_PWD }} --all
