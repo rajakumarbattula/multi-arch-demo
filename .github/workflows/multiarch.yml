@@ -44,10 +44,19 @@ jobs:
           buildah inspect ${{ env.IMAGE_NAME }}:linux-amd64 | jq ".Docker.architecture"
           buildah inspect ${{ env.IMAGE_NAME }}:linux-ppc64le | jq ".OCIv1.architecture"
           buildah inspect ${{ env.IMAGE_NAME }}:linux-ppc64le | jq ".Docker.architecture"
+          
+      # Authenticate to container image registry to push the image
+      - name: Podman Login
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USER }}
+          password: ${{ secrets.QUAY_PWD }}
+          
       - name: Create and add to manifest
         run: |
           buildah manifest create ${{ env.IMAGE_NAME }}
           buildah manifest add ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:linux-amd64
           buildah manifest add ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:linux-ppc64le
       - name: Push manifest
-        run: buildah manifest push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  docker://${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} --creds ${{ secrets.QUAY_USER }}:${{ secrets.QUAY_PWD }} --all
+        run: podman manifest push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  --all
