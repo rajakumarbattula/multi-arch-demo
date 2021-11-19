@@ -7,80 +7,47 @@ on:
     - cron: '0 0 * * *'  # every day at midnight
 
 env:
-  IMAGE_NAME: test-multi-arch
   IMAGE_TAG: latest
-  IMAGE_REGISTRY: quay.io
-  IMAGE_NAMESPACE: mayurwaghmode111
 
 jobs:
-  build:
-    name: Build image using Buildah
+  build-multiplatform-containerfile:
+    name: Build multi-platform image using Containerfile
+    env:
+      IMAGE_NAME: test-multi-arch
     runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: [ amd64, ppc64le ]
     steps:
 
-      # Checkout buildah action github repository
-      - name: Checkout Buildah action
-        uses: actions/checkout@v2
-        with:
-          path: "multi-arch-demo"
-
       - name: Install qemu dependency
-        run: sudo apt-get install -y qemu-user-static
-
-      - name: Create Dockerfile
         run: |
-          cat > Dockerfile<<EOF
-          ARG ARCH
-          FROM docker.io/\${ARCH}/alpine:3.14
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-static
+      - name: Create Containerfile3
+        run: |
+          cat > Containerfile3<<EOF
+          FROM docker.io/alpine:3.14
           RUN echo "hello world"
           ENTRYPOINT [ "sh", "-c", "echo -n 'Machine: ' && uname -m && echo -n 'Bits: ' && getconf LONG_BIT && echo 'goodbye world'" ]
           EOF
-      - name: Build Image
-        id: build_image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: ${{ env.IMAGE_NAME }}
-          tags: ${{ env.IMAGE_TAG }}
-          arch: ${{ matrix.arch }}
-          build-args: ARCH=${{ matrix.arch }}
-          dockerfiles: |
-            ./Dockerfile
-      - name: Echo Outputs
-        run: |
-          echo "Image: ${{ steps.build_image.outputs.image }}"
-          echo "Tags: ${{ steps.build_image.outputs.tags }}"
+      - name: Build image linux/amd64
+        run: buildah bud --platform linux/amd64 -f ./Containerfile3 --format docker -t ${{ env.IMAGE_NAME }}:linux-amd64
+
+      - name: Build image linux/ppc64le
+        run: buildah bud --platform linux/ppc64le -f ./Containerfile3 --format docker -t ${{ env.IMAGE_NAME }}:linux-ppc64le
+
       - name: Check images created
         run: buildah images | grep '${{ env.IMAGE_NAME }}'
 
       - name: Check image metadata
         run: |
           set -x
-          buildah inspect ${{ steps.build_image.outputs.image }}:${{ env.IMAGE_TAG }} | jq ".OCIv1.architecture"
-          buildah inspect ${{ steps.build_image.outputs.image }}:${{ env.IMAGE_TAG }} | jq ".Docker.architecture"
-      - name: Run image
+          buildah inspect ${{ env.IMAGE_NAME }}:linux-amd64 | jq ".OCIv1.architecture"
+          buildah inspect ${{ env.IMAGE_NAME }}:linux-amd64 | jq ".Docker.architecture"
+          buildah inspect ${{ env.IMAGE_NAME }}:linux-ppc64le | jq ".OCIv1.architecture"
+          buildah inspect ${{ env.IMAGE_NAME }}:linux-ppc64le | jq ".Docker.architecture"
+      - name: Create and add to manifest
         run: |
-          podman run --rm ${{ steps.build_image.outputs.image }}:${{ env.IMAGE_TAG }}
-          
-      # Authenticate to container image registry to push the image
-      - name: Podman Login
-        uses: redhat-actions/podman-login@v1
-        with:
-          registry: quay.io
-          username: ${{ secrets.QUAY_USER }}
-          password: ${{ secrets.QUAY_PWD }}
-     
-     
-      - name: Push To Quay
-        uses: redhat-actions/push-to-registry@v2
-        id: push
-        with:
-          image: ${{ steps.build_image.outputs.image }}
-          tags: ${{ steps.build_image.outputs.tags }}
-          registry: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}
-          platforms: linux/amd64,linux/ppc64le
-          extra-args: |
-            --disable-content-trust
+          buildah manifest create ${{ env.IMAGE_NAME }}
+          buildah manifest add ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:linux-amd64
+          buildah manifest add ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:linux-ppc64le
+      - name: Push manifest
+        run: buildah manifest push ${{ env.IMAGE_NAME }}:latest docker://quay.io/mayurwaghmode111/${{ env.IMAGE_NAME }}:latest --creds mayurwaghmode111:${{ secrets.QUAY_PWD }} --all
