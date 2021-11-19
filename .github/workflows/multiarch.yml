@@ -7,8 +7,10 @@ on:
     - cron: '0 0 * * *'  # every day at midnight
 
 env:
-  IMAGE_NAME: hello-world-multiarch
+  IMAGE_NAME: test-multi-arch
   IMAGE_TAG: latest
+  IMAGE_REGISTRY: quay.io
+  IMAGE_NAMESPACE: mayurwaghmode111
 
 jobs:
   build:
@@ -62,3 +64,23 @@ jobs:
       - name: Run image
         run: |
           podman run --rm ${{ steps.build_image.outputs.image }}:${{ env.IMAGE_TAG }}
+          
+      # Authenticate to container image registry to push the image
+      - name: Podman Login
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USER }}
+          password: ${{ secrets.QUAY_PWD }}
+     
+     
+      - name: Push To Quay
+        uses: redhat-actions/push-to-registry@v2
+        id: push
+        with:
+          image: ${{ steps.build_image_multiplatform.outputs.image }}
+          tags: ${{ steps.build_image_multiplatform.outputs.tags }}
+          registry: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}
+          platform: ${{ matrix.platform }}
+          extra-args: |
+            --disable-content-trust
