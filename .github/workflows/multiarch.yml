@@ -17,18 +17,13 @@ jobs:
     name: Build multi-platform image using Dcokerfile
     runs-on: ubuntu-20.04
     steps:
+      - name: add checkout action...
+        uses: actions/checkout@v2
+        
       - name: Install qemu dependency
         run: |
           sudo apt-get update
           sudo apt-get install -y qemu-user-static
-          
-      - name: Create Dockerfile
-        run: |
-          cat > Dockerfile<<EOF
-          FROM docker.io/alpine:3.14
-          RUN echo "hello world"
-          ENTRYPOINT [ "sh", "-c", "echo -n 'Machine: ' && uname -m && echo -n 'Bits: ' && getconf LONG_BIT && echo 'goodbye world'" ]
-          EOF
             
       - name: Build image linux/amd64
         uses: redhat-actions/buildah-build@v2
@@ -45,9 +40,9 @@ jobs:
           image: ${{ env.IMAGE_NAME }}
           tags: linux-ppc64le
           arch: ppc64le
-          containerfiles: |
-            ./Dockerfile
-            
+          context: .
+          file: ./Dockerfile
+               
       - name: Check images created
         run: buildah images | grep '${{ env.IMAGE_NAME }}'
 
