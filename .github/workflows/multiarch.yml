@@ -27,7 +27,7 @@ jobs:
         with:
           image: ${{ env.IMAGE_NAME }}
           tags: linux-amd64
-          platform: linux/amd64
+          arch: linux/amd64
           context: .
           file: ./Dockerfile
             
