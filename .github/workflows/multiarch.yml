@@ -22,15 +22,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qemu-user-static
           
-      - name: Build image linux/amd64
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: ${{ env.IMAGE_NAME }}
-          tags: linux-amd64
-          arch: linux/amd64
-          context: .
-          file: ./Dockerfile
+      - name: Create Containerfile3
+        run: |
+          cat > Dockerfile<<EOF
+          FROM ubuntu:20.04
+          CMD echo "Hello World from a container running on $(uname -m);"
+          EOF
             
+      - name: Build image linux/amd64
+        run: buildah bud --platform linux/amd64 -f Dockerfile --format docker -t ${{ env.IMAGE_NAME }}:linux-amd64
+     
       - name: Build image linux/ppc64le
         run: buildah bud --platform linux/ppc64le -f Dockerfile --format docker -t ${{ env.IMAGE_NAME }}:linux-ppc64le
 
