@@ -22,7 +22,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qemu-user-static
           
-      - name: Create Containerfile3
+      - name: Create Dockerfile
         run: |
           cat > Dockerfile<<EOF
           FROM ubuntu:20.04
@@ -38,8 +38,13 @@ jobs:
             ./Dockerfile
      
       - name: Build image linux/ppc64le
-        run: buildah bud --platform linux/ppc64le -f Dockerfile --format docker -t ${{ env.IMAGE_NAME }}:linux-ppc64le
-
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: linux-ppc64le
+          containerfiles: |
+            ./Dockerfile
+            
       - name: Check images created
         run: buildah images | grep '${{ env.IMAGE_NAME }}'
 
