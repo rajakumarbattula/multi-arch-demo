@@ -28,8 +28,8 @@ jobs:
           image: ${{ env.IMAGE_NAME }}
           tags: linux-amd64
           platform: linux/amd64
-          dockerfiles: |
-            ./Dockerfile
+          context: .
+          file: ./Dockerfile
             
       - name: Build image linux/ppc64le
         run: buildah bud --platform linux/ppc64le -f Dockerfile --format docker -t ${{ env.IMAGE_NAME }}:linux-ppc64le
