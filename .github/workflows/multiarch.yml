@@ -23,10 +23,10 @@ jobs:
           sudo apt-get install -y qemu-user-static
           
       - name: Build image linux/amd64
-        run: buildah bud --platform linux/amd64 -f ./Dockerfile --format docker -t ${{ env.IMAGE_NAME }}:linux-amd64
+        run: buildah bud --platform linux/amd64 -f Dockerfile --format docker -t ${{ env.IMAGE_NAME }}:linux-amd64
 
       - name: Build image linux/ppc64le
-        run: buildah bud --platform linux/ppc64le -f ./Dockerfile --format docker -t ${{ env.IMAGE_NAME }}:linux-ppc64le
+        run: buildah bud --platform linux/ppc64le -f Dockerfile --format docker -t ${{ env.IMAGE_NAME }}:linux-ppc64le
 
       - name: Check images created
         run: buildah images | grep '${{ env.IMAGE_NAME }}'
