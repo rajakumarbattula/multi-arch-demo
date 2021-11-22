@@ -30,7 +30,12 @@ jobs:
           EOF
             
       - name: Build image linux/amd64
-        run: buildah bud --platform linux/amd64 -f Dockerfile --format docker -t ${{ env.IMAGE_NAME }}:linux-amd64
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: latest 
+          containerfiles: |
+            ./Dockerfile
      
       - name: Build image linux/ppc64le
         run: buildah bud --platform linux/ppc64le -f Dockerfile --format docker -t ${{ env.IMAGE_NAME }}:linux-ppc64le
