@@ -22,14 +22,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qemu-user-static
           
-      - name: Create Containerfile3
-        run: |
-          cat > Dockerfile<<EOF
-          FROM docker.io/alpine:3.14
-          RUN echo "hello world"
-          ENTRYPOINT [ "sh", "-c", "echo -n 'Machine: ' && uname -m && echo -n 'Bits: ' && getconf LONG_BIT && echo 'goodbye world'" ]
-          EOF
-          
       - name: Build image linux/amd64
         run: buildah bud --platform linux/amd64 -f ./Dockerfile --format docker -t ${{ env.IMAGE_NAME }}:linux-amd64
 
