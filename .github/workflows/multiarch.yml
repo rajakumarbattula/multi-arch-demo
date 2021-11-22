@@ -34,6 +34,7 @@ jobs:
         with:
           image: ${{ env.IMAGE_NAME }}
           tags: linux-amd64
+          arch: amd64
           containerfiles: |
             ./Dockerfile
      
@@ -42,6 +43,7 @@ jobs:
         with:
           image: ${{ env.IMAGE_NAME }}
           tags: linux-ppc64le
+          arch: ppc64le
           containerfiles: |
             ./Dockerfile
             
