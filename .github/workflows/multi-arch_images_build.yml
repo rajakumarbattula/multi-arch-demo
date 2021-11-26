@@ -4,8 +4,8 @@ on:
   push:
       
 env:
-  image: test-multi-arch
-  tags: latest 
+  IMAGE_NAME: test-multi-arch
+  IMAGE_TAG: latest 
   IMAGE_REGISTRY: quay.io
   IMAGE_NAMESPACE: mayurwaghmode111
 
