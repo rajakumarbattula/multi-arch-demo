@@ -1,12 +1,7 @@
 name: Multiarch build
 
 on:
-  pull_request:
-
   push:
-    branches:
-      - master
-      - release_*
       
 env:
   image: test-multi-arch
