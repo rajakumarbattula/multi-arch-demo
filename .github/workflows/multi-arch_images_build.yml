@@ -5,7 +5,7 @@ on:
       
 env:
   IMAGE_NAME: test-multi-arch
-  IMAGE_TAG: latest 
+  IMAGE_TAG: latest ${{ github.sha }}
   IMAGE_REGISTRY: quay.io
   IMAGE_NAMESPACE: mayurwaghmode111
 
@@ -57,3 +57,7 @@ jobs:
           
       - name: Push manifest to quay.io
         run: podman manifest push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  --all
+        
+      - name: Push manifest to quay.io
+        run: podman manifest push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  quay.io/ mayurwaghmode111/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  --all
+        if: ${{ github.event_name == 'push' }}
