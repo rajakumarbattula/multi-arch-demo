@@ -57,4 +57,4 @@ jobs:
         
       - name: Push manifest to quay.io
         run: podman manifest push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  quay.io/ mayurwaghmode111/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  --all
-        if: ${{ github.event_name == 'push' }}
+        
