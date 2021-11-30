@@ -54,9 +54,6 @@ jobs:
           buildah manifest create ${{ env.IMAGE_NAME }}
           buildah manifest add ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:linux-amd64
           buildah manifest add ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:linux-ppc64le
-          
-      - name: Push manifest to quay.io
-        run: podman manifest push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  --all
         
       - name: Push manifest to quay.io
         run: podman manifest push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  quay.io/ mayurwaghmode111/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}  --all
