@@ -29,8 +29,6 @@ jobs:
           image: ${{ env.IMAGE_NAME }}
           tags: latest
           archs: amd64, ppc64le
-          build-args: |
-            ARCH=ppc-here
           dockerfiles: |
             ./Dockerfile
             
