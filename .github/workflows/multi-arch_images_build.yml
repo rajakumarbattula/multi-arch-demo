@@ -25,7 +25,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.IMAGE_NAME }}
-          tags: latest
+          tags: ${{ env.IMAGE_TAG }}
           archs: amd64, ppc64le, s390x, arm64
           dockerfiles: |
             ./Dockerfile
@@ -36,7 +36,7 @@ jobs:
         with:
           image: ${{ steps.build-image.outputs.image }}
           tags: ${{ steps.build-image.outputs.tags }}
-          registry: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}:${{ env.IMAGE_TAG }}
+          registry: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_PWD }}
 
